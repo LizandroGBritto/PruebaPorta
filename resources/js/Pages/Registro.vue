@@ -13,7 +13,7 @@
                     type="text"
                     id="name"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="name@flowbite.com"
+                    placeholder="Tu nombre"
                     required
                 />
             </div>
@@ -38,7 +38,7 @@
                 <label
                     for="telefono"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                    >Telefono</label
+                    >Teléfono</label
                 >
                 <input
                     name="telefono"
@@ -46,11 +46,14 @@
                     type="text"
                     id="telefono"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="name@flowbite.com"
+                    placeholder="Ingrese su número de teléfono"
                     required
+                    @input="validateTelefono"
                 />
+                <p v-if="telefonoError" class="text-red-500 text-sm mt-1">
+                    Solo se permiten números.
+                </p>
             </div>
-
             <div class="mb-5">
                 <label
                     for="imagen_perfil"
@@ -98,13 +101,19 @@
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     required
                 />
-                <p v-if="isMatch.passwordMatch" class="text-red-500 text-sm mt-1">
+                <p
+                    v-if="isMatch.passwordMatch"
+                    class="text-red-500 text-sm mt-1"
+                >
                     Las contraseñas no coinciden.
                 </p>
-                <p class="text-red-500 text-sm mt-1" v-for="(error, k) in errors" :key="k">
+                <p
+                    class="text-red-500 text-sm mt-1"
+                    v-for="(error, k) in errors"
+                    :key="k"
+                >
                     {{ error }}
                 </p>
-
             </div>
             <button
                 type="submit"
@@ -114,11 +123,10 @@
             </button>
 
             <Link
-                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-5"
-                            href="/login"
-                            >Iniciar Sesion</Link
-                        >
-              
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-5"
+                href="/login"
+                >Iniciar Sesion</Link
+            >
         </form>
     </div>
 </template>
@@ -126,76 +134,80 @@
 import axios from "axios";
 
 export default {
-    data() {
-        return {
-            form: {
-                name: "",
-                telefono: "",
-                imagen_perfil: null, 
-                email: "",
-                password: "",
-                password2: "", // Campo para confirmar contraseña
-            },
-            isMatch: {
-                passwordMatch: false,
-                 // Estado del error de contraseña
-            },
-            errors: []
-        };
+  data() {
+    return {
+      form: {
+        name: "",
+        telefono: "",
+        imagen_perfil: null,
+        email: "",
+        password: "",
+        password2: "",
+      },
+      telefonoError: false, // Indica si hay un error en el campo teléfono
+      isMatch: {
+        passwordMatch: false,
+      },
+      errors: [],
+    };
+  },
+  methods: {
+    validateTelefono(event) {
+      // Elimina caracteres no numéricos
+      const value = event.target.value.replace(/\D/g, ""); // Solo números
+      if (value !== this.form.telefono) {
+        this.telefonoError = true; // Mostrar mensaje de error
+      } else {
+        this.telefonoError = false; // No hay errores
+      }
+      this.form.telefono = value; // Actualizar el modelo
     },
-    methods: {
-        handleFileChange(event) {
+    handleFileChange(event) {
+      this.errors = [];
+      const file = event.target.files[0];
+      if (file) {
+        this.form.imagen_perfil = file;
+      }
+    },
+    registro() {
+      if (this.form.password !== this.form.password2) {
+        this.isMatch.passwordMatch = true;
+        return;
+      } else {
+        this.isMatch.passwordMatch = false;
+      }
 
-            this.errors = [];
+      const formData = new FormData();
+      formData.append("name", this.form.name);
+      formData.append("telefono", this.form.telefono);
+      formData.append("imagen_perfil", this.form.imagen_perfil);
+      formData.append("email", this.form.email);
+      formData.append("password", this.form.password);
 
-            const file = event.target.files[0];
-            if (file) {
-                this.form.imagen_perfil = file; // Asignar el archivo al objeto `form`
-            }
-        },
-        registro() {
-            // Validar contraseñas
-            if (this.form.password !== this.form.password2) {
-                this.isMatch.passwordMatch = true;
-                return;
+      axios
+        .post("/registro", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((response) => {
+          this.$inertia.visit('/login');
+        })
+        .catch((error) => {
+          if (error.response && error.response.status) {
+            const status = error.response.status;
+
+            if (status == 422) {
+              const errors = error.response.data.errors;
+              this.errors = Object.values(errors).flat();
             } else {
-                this.isMatch.passwordMatch = false;
+              this.errors = ["Error en el servidor:" + status];
             }
-
-            const formData = new FormData();
-            formData.append("name", this.form.name);
-            formData.append("telefono", this.form.telefono);
-            formData.append("imagen_perfil", this.form.imagen_perfil);
-            formData.append("email", this.form.email);
-            formData.append("password", this.form.password);
-
-            axios
-                .post("/registro", formData, {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                })
-                .then((response) => {
-                    this.$inertia.visit('/login');
-                })
-                .catch((error) => {
-                    if(error.response && error.response.status){
-                        const status = error.response.status
-
-                        if (status == 422){
-                            const errors = error.response.data.errors;
-                            this.errors = Object.values(errors).flat();
-                        } else{
-
-                            this.errors = ['Error en el sevidor:' + status]
-
-                        } 
-                        }else{
-                            this.errors = ['Error inesperado']
-
-                    }
-                });
-        },
+          } else {
+            this.errors = ["Error inesperado"];
+          }
+        });
     },
+  },
 };
 </script>
