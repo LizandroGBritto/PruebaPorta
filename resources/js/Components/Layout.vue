@@ -3,7 +3,7 @@
         <header>
             <nav>
                 <ul>
-                    <li><Link href="/">Inicio</Link></li>
+                    <li><Link href="/login">Login</Link></li>
                     <li><Link href="/registro">Registro</Link></li>
                 </ul>
             </nav>
@@ -11,9 +11,6 @@
         <main>
             <slot></slot>
         </main>
-        <footer>
-            <p>© 2025 - Todos los derechos reservados</p>
-        </footer>
     </div>
 </template>
 
