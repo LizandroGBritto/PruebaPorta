@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 
+Route::get('',[AuthController::class, 'registro']);
+
 Route::get('registro',[AuthController::class, 'registro']);
 Route::post('registro',[AuthController::class, 'registroPost']);
 

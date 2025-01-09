@@ -2,10 +2,7 @@
     <div>
         <header>
             <nav>
-                <ul>
-                    <li><Link href="/login">Login</Link></li>
-                    <li><Link href="/registro">Registro</Link></li>
-                </ul>
+                <h1 class="flex justify-center font-medium">Prueba Tecnica - Porta</h1>
             </nav>
         </header>
         <main>
@@ -16,6 +13,6 @@
 
 <script>
 export default {
-    name: "Layout"
+    name: "Layout",
 };
 </script>

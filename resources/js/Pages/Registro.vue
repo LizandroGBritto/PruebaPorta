@@ -112,6 +112,13 @@
             >
                 Registrarme
             </button>
+
+            <Link
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-5"
+                            href="/login"
+                            >Iniciar Sesion</Link
+                        >
+              
         </form>
     </div>
 </template>

@@ -31,11 +31,14 @@
                 />
             </div>
             <div class="flex items-start mb-5">
-                <p class="text-red-500 text-sm mt-1" v-for="(error, k) in errors" :key="k">
+                <p
+                    class="text-red-500 text-sm mt-1"
+                    v-for="(error, k) in errors"
+                    :key="k"
+                >
                     {{ error }}
                 </p>
             </div>
-           
 
             <button
                 type="submit"
@@ -43,6 +46,12 @@
             >
                 Iniciar Sesion
             </button>
+
+            <Link
+                class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-5"
+                href="/registro"
+                >Registrarme</Link
+            >
         </form>
     </div>
 </template>
@@ -57,43 +66,39 @@ export default {
                 email: "",
                 password: "",
             },
-            errors: []
+            errors: [],
         };
-   
     },
     methods: {
         enviarFormulario() {
             this.errors = [];
 
-            axios.post("login", {
-                    email: this.form.email, 
-                    password: this.form.password, 
-                    
+            axios
+                .post("login", {
+                    email: this.form.email,
+                    password: this.form.password,
                 })
                 .then((res) => {
-                    console.log('aqui');
-                    this.$inertia.visit('/inicio');
+                    console.log("aqui");
+                    this.$inertia.visit("/inicio");
                 })
                 .catch((error) => {
-                    if(error.response && error.response.status){
-                        const status = error.response.status
+                    if (error.response && error.response.status) {
+                        const status = error.response.status;
 
-                        if (status == 422){
+                        if (status == 422) {
                             const errors = error.response.data.errors;
                             this.errors = Object.values(errors).flat();
-                        }else if(status == 401){
-                            this.errors = ['Credenciales incorrectas']
-                        } else{
-
-                            this.errors = ['Error en el sevidor:' + status]
-
-                        } 
-                        }else{
-                            this.errors = ['Error inesperado']
-
+                        } else if (status == 401) {
+                            this.errors = ["Credenciales incorrectas"];
+                        } else {
+                            this.errors = ["Error en el sevidor:" + status];
+                        }
+                    } else {
+                        this.errors = ["Error inesperado"];
                     }
                 });
+        },
     },
-}
 };
 </script>
